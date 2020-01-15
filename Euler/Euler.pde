@@ -2,7 +2,7 @@ void setup()
 {
   size(1000, 600);
   background(100);
-  String test = "3 * x + (2 * x + 5 * ( x - 3 )) * (x + 5)";
+  String test = "3*x + (2*x + 5*(x - 3)) * (x + 5)";
   parseFunction(test);
 }
 
@@ -13,8 +13,10 @@ void draw()
 
 public void parseFunction(String input)
 {
-  ArrayList<Calculable> terms = new ArrayList<Calculable>();
   ArrayList<String> subfunctions = new ArrayList<String>();
+  
+  input = input.replaceAll("\\s","");
+  Function function = new Function(null, new ArrayList<Calculable>());
   
   char counter = 'A';
   while(input.contains("("))
@@ -41,16 +43,22 @@ public void parseFunction(String input)
       }
     }
     
-    subfunctions. add(input.substring(begin + 1, end));
+    subfunctions.add(input.substring(begin + 1, end));
     input = input.substring(0, begin) + counter + input.substring(end + 1);
     counter++;
   }
   
+  String terms[] = input.split("[+-]+");
+  
   println(input);
   
-  for(int i = 0; i < subfunctions.size(); i++)
+  for(int i = 0; i < terms.length; i++)
   {
-    println(subfunctions.get(i));
+    while(terms[i].contains("^"))
+    {
+      int index = terms[i].indexOf("^");
+      
+    }
   }
 }
 
