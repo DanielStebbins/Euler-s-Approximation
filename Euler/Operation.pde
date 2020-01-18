@@ -1,8 +1,11 @@
 class Operation extends Calculable
 {
+  private float constant;
+  
   public Operation(Calculable next)
   {
     setNext(next);
+    constant = 0.0;
   }
   
   public float calculate(float x, float current)
@@ -20,6 +23,6 @@ class Operation extends Calculable
   //To be overridden with mathematical operation when initialized.
   public float operation(float x, float current)
   {
-    return 0.0;
+    return constant;
   }
 }

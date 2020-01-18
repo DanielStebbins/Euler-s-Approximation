@@ -24,4 +24,7 @@ class Function extends Calculable
     
     return getNext().calculate(x, total);
   }
+  
+  public ArrayList<Calculable> getTerms() { return terms; }
+  public void setTerms(ArrayList<Calculable> terms) { this.terms = terms; }
 }
