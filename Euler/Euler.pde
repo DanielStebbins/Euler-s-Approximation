@@ -3,7 +3,7 @@ void setup()
   size(1000, 600);
   background(100);
   String test = "3 * x + (2 * x + 5 * ( x - 3 )) * (x + 5)";
-  parseFunction(test);
+  //parseFunction(test);
 }
 
 void draw()

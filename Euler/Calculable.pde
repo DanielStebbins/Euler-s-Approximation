@@ -1,4 +1,4 @@
- abstract class Calculable
+abstract class Calculable
 {
   private Calculable next;
   
