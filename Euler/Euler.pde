@@ -1,15 +1,58 @@
+//Text font sizes.
+int label = 14;
+int title = 32;
+
+//Color constants.
+color background = #202020;
+color element = #8f8f8f;
+color text = #cccccc;
+
+AllDrawn drawn = new AllDrawn();
+
 void setup()
 {
   size(1000, 600);
-  background(100);
-  String test = "3 * x + (2 * x + 5 * ( x - 3 )) * (x + 5)";
+  background(background);
+  
+  //surface.setResizable(true);
+  
+  Graph graph = new Graph(400, 50, 500, 500, element, label, text);
+  Button Line = new Button(100, 100, 100, 50, element, 10, "Line", 12, text, new Executable(){ public void execute() { functionLine(); }});
+  Button parabola = new Button(100, 200, 100, 50, element, 10, "Parabola", 12, text, new Executable(){ public void execute() { functionParabola(); }});
+  Button cubic = new Button(100, 300, 100, 50, element, 10, "Cubic", 12, text, new Executable(){ public void execute() { functionCubic(); }});
+  Button root = new Button(100, 400, 100, 50, element, 10, "Root", 12, text, new Executable(){ public void execute() { functionRoot(); }});
+  
+  drawn.addDrawn(graph);
+  drawn.addDrawn(Line);
+  drawn.addDrawn(parabola);
+  drawn.addDrawn(cubic);
+  drawn.addDrawn(root);
+  
+  
+  
+  
+  //String test = "3 * x + (2 * x + 5 * ( x - 3 )) * (x + 5)";
   //parseFunction(test);
 }
 
 void draw()
 {
+  background(background);
+  drawn.display();
 }
 
+void mousePressed()
+{
+  for(Drawn d: drawn.getAllDrawn())
+  {  
+    if(d instanceof Button)
+    {
+      ((Button) d).clicked();
+    }
+  }
+}
+
+/*
 public void parseFunction(String input)
 {
   ArrayList<String> subfunctions = new ArrayList<String>();
@@ -62,7 +105,9 @@ public void parseFunction(String input)
     }
   }
 }
+*/
 
+/*
 public Operation parseOperation(String term, int index)
 {
   int start = 0;
@@ -94,19 +139,15 @@ public Operation parseOperation(String term, int index)
 
   }
 }
+*/
 
 
 
-
-
-
-
-
-
-
-public void testFunction()
+//x
+public void functionLine()
 {
   ArrayList<Calculable> terms = new ArrayList<Calculable>();
+  
   terms.add(new Operation(null)
   {
     public float operation(float x, float current)
@@ -115,44 +156,65 @@ public void testFunction()
     }
   }
   );
+  
+  Function test = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setFunction(test);
+}
 
-  terms.get(0).setNext(new Operation(null)
-  {
-    public float operation(float x, float current)
-    {
-      return 2 * current;
-    }
-  }
-  );
-
+//x^2
+public void functionParabola()
+{
+  ArrayList<Calculable> terms = new ArrayList<Calculable>();
+  
   terms.add(new Operation(null)
   {
     public float operation(float x, float current)
     {
-      return 3;
+      return (float) Math.pow(x, 2);
     }
   }
   );
-
-  terms.get(1).setNext(new Operation(null)
-  {
-    public float operation(float x, float current)
-    {
-      return (float) Math.pow(current, x);
-    }
-  }
-  );
-
+  
   Function test = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setFunction(test);
+}
 
-
-  test.setNext(new Operation(null)
+//x^3
+public void functionCubic()
+{
+  ArrayList<Calculable> terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
   {
     public float operation(float x, float current)
     {
-      return 2 * current;
+      return (float) Math.pow(x, 3);
     }
   }
   );
-  println(test.calculate(2, 0));
+  
+  Function test = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setFunction(test);
+}
+
+//x^(1/2)
+public void functionRoot()
+{
+  ArrayList<Calculable> terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
+  {
+    public float operation(float x, float current)
+    {
+      return (float) Math.pow(x, .5);
+    }
+  }
+  );
+  
+  Function test = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setFunction(test);
 }
