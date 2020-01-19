@@ -12,7 +12,16 @@ public class Graph extends DrawnText
   private float xScale;
   private float yScale;
   
+  private float xAxis;
+  private float yAxis;
+  
   Function function;
+  private ArrayList<float[]> curve;
+  
+  Function derivative;
+  private ArrayList<float[]> dcurve;
+  
+  private ArrayList<float[]> tangents;
   
   public Graph(float x, float y, float w, float h, color c, float textSize, color textColor)
   {
@@ -29,12 +38,17 @@ public class Graph extends DrawnText
     xTick = 1;
     yTick = 1;
     
-    sample = .001;
+    sample = (xMax - xMin) / 10000;
     
     xScale = w / (xMax - xMin);
     yScale = -1 * h / (yMax - yMin);
     
+    xAxis = yScale * -yMax;
+    yAxis = xScale * -xMin;
+    
     function = null;
+    derivative = null;
+    curve = null;
   }
   
   public void update()
@@ -46,32 +60,24 @@ public class Graph extends DrawnText
   public void display()
   {
     stroke(getC());
-    textAlign(CENTER, TOP);
-    textSize(getTextSize());
     
     //Vertical lines on the chart, each corresponding to a year value displayed on the bottom.
-    float offset = w / (xMax - xMin + 2);
-    for(int i = 0; i <= xMax - xMin; i += xTick)
+    for(float i = xMin; i < xMax; i += xTick)
     {
-      line(getX() + offset * (i + 1), getY() + h/2 + 5, getX() + offset * (i + 1), getY() + h/2 - 5);
-      //text(xMin + i, getX() + offset * (i + 1), h + getY()); 
+      line(shiftX(i), shiftY(0) + 5, shiftX(i), shiftY(0) - 5);
     }
     
     //Horizontal lines on the chart, each corresponding to a time value displayed on the lefthand side.
-    offset = h / (yMax - yMin);
-    for(int i = 0; i <= yMax - yMin; i += yTick)
+    for(float i = yMin; i < yMax; i += yTick)
     {
-      
-      line(getX() + w/2 + 5, getY() + offset * i, getX() + w/2 - 5, getY() + offset * i);
-      //textAlign(RIGHT);
-      //text(yMin + i, getX() - 10, getY() + offset * i + getTextSize() * .5); 
+      line(shiftX(0) + 5, shiftY(i), shiftX(0) - 5, shiftY(i));
     }
     
     //Y-Axis Line.
-    line(getX() + w/2, getY(), getX() + w/2, h + getY());
+    line(shiftX(0), getY(), shiftX(0), h + getY());
     
     //X-Axis Line.
-    line(getX(), getY() + h/2, w + getX(), getY() + h/2);
+    line(getX(), shiftY(0), w + getX(), shiftY(0));
     
     //Vertical lines on the two sides of the chart.
     line(getX(), getY(), getX(), h + getY());
@@ -81,40 +87,146 @@ public class Graph extends DrawnText
     line(getX(), getY(), w + getX(), getY());
     line(getX(), h + getY(), w + getX(), h + getY());
     
-    if(function != null)
+    graph(function, curve, element);
+    graph(derivative, dcurve, #ff0000);
+    
+    if(tangents != null)
     {
-      float last = function.calculate(xMin, 0);
-      float current = 0.0;
-      for(float i = xMin + sample; i <= xMax; i += sample)
+      for(int i = 0; i < tangents.size(); i++)
       {
-        current = function.calculate(i, 0);
-        
-        if(current > yMin && current < yMax)
-        {
-          line(shiftX((i - sample)), shiftY(last), shiftX(i), shiftY(current));
-        }
-        
-        last = current;
+        stroke(#0000ff);
+        line(tangents.get(i)[0], tangents.get(i)[1], tangents.get(i)[2], tangents.get(i)[3]);
+        stroke(element);
       }
     }
   }
   
+  public ArrayList<float[]> graph(Function f, ArrayList<float[]> cur, color c)
+  {
+    stroke(c);
+    
+    if(f != null && cur == null)
+    {
+      cur = new ArrayList<float[]>();
+      
+      float last = f.calculate(xMin, 0);
+      float current = 0.0;
+      for(float i = xMin + sample; i <= xMax; i += sample)
+      {
+        current = f.calculate(i, 0);
+        
+        if(last > yMin && last < yMax && current > yMin && current < yMax)
+        {
+          line(shiftX((i - sample)), shiftY(last), shiftX(i), shiftY(current));
+          
+          float[] temp = {shiftX((i - sample)), shiftY(last), shiftX(i), shiftY(current)};
+          cur.add(temp);
+        }
+   
+        last = current;
+      }
+      
+      stroke(element);
+      return cur;
+    }
+    else if(cur != null)
+    {
+      for(int i = 0; i < cur.size(); i++)
+      {
+        line(cur.get(i)[0], cur.get(i)[1], cur.get(i)[2], cur.get(i)[3]);
+      }
+    }
+    
+    stroke(element);
+    return null;
+  }
+  
+  public void euler(float start, float end, int steps)
+  {
+    stroke(#0000ff);
+    
+    float stepSize = (end - start) / steps;
+    
+    tangents = new ArrayList<float[]>();
+    float last = function.calculate(start, 0);
+    float current = 0;
+    for(float i = start + stepSize; i <= start + steps * stepSize; i += stepSize)
+    {
+      current = last + derivative.calculate(i - stepSize, 0) * stepSize;
+      line(shiftX(i - stepSize), shiftY(last), shiftX(i), shiftY(current));
+      
+      float[] temp = {shiftX(i - stepSize), shiftY(last), shiftX(i), shiftY(current)};
+      tangents.add(temp);
+      
+      last = current;
+    }
+    
+    stroke(element);
+  }
+  
+  public void reset(float xMin, float xMax, float yMin, float yMax)
+  {
+    this.xMin = xMin;
+    this.xMax = xMax;
+    this.yMin = yMin;
+    this.yMax = yMax;
+    
+    sample = (xMax - xMin) / 10000;
+    
+    xScale = w / (xMax - xMin);
+    yScale = -1 * h / (yMax - yMin);
+    
+    xAxis = yScale * -yMax;
+    yAxis = xScale * -xMin;
+    
+    curve = null;
+    dcurve = null;
+  }
+  
   public float shiftX(float x)
   {
+
     x *= xScale;
+  
+    
     x += getX();
-    x += w/2; 
+    x += yAxis; 
     return x;
   }
   
   public float shiftY(float y)
   {
     y *= yScale;
+
+    
     y += getY();
-    y += h/2; 
+    y += xAxis; 
     return y;
   }
   
   public Function getFunction() { return function; }
-  public void setFunction(Function function) { this.function = function; }
+  public void setFunction(Function function)
+  { 
+    this.function = function;
+    curve = null;
+  }
+  
+  public Function getDerivative() { return derivative; }
+  public void setDerivative(Function derivative)
+  { 
+    this.derivative = derivative;
+    dcurve = null;
+  }
+  
+  public float getXMin() { return xMin; }
+  public void setXMin(float xMin) { this.xMin = xMin; } 
+  
+  public float getXMax() { return xMax; }
+  public void setXMax(float xMax) { this.xMax = xMax; } 
+  
+  public float getYMin() { return yMin; }
+  public void setYMin(float yMin) { this.yMin = yMin; } 
+  
+  public float getYMax() { return yMax; }
+  public void setYMax(float yMax) { this.yMax = yMax; } 
 }

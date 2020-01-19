@@ -17,16 +17,44 @@ void setup()
   //surface.setResizable(true);
   
   Graph graph = new Graph(400, 50, 500, 500, element, label, text);
-  Button Line = new Button(100, 100, 100, 50, element, 10, "Line", 12, text, new Executable(){ public void execute() { functionLine(); }});
-  Button parabola = new Button(100, 200, 100, 50, element, 10, "Parabola", 12, text, new Executable(){ public void execute() { functionParabola(); }});
-  Button cubic = new Button(100, 300, 100, 50, element, 10, "Cubic", 12, text, new Executable(){ public void execute() { functionCubic(); }});
-  Button root = new Button(100, 400, 100, 50, element, 10, "Root", 12, text, new Executable(){ public void execute() { functionRoot(); }});
+  
+  TextInput xMin = new TextInput(50, 50, 100, 25, element, #ffffff, label, text, #000000, "-10");
+  TextInput xMax = new TextInput(50, 90, 100, 25, element, #ffffff, label, text, #000000, "10");
+  TextInput yMin = new TextInput(50, 130, 100, 25, element, #ffffff, label, text, #000000, "-10");
+  TextInput yMax = new TextInput(50, 170, 100, 25, element, #ffffff, label, text, #000000, "10");
+  Button submit = new Button(50, 210, 100, 50, element, 10, "Submit", label, text, new Executable(){ public void execute() { submit(); }});
+  
+  
+  TextInput start = new TextInput(50, 300, 100, 25, element, #ffffff, label, text, #000000, "4");
+  TextInput end = new TextInput(50, 340, 100, 25, element, #ffffff, label, text, #000000, "1");
+  TextInput steps = new TextInput(50, 380, 100, 25, element, #ffffff, label, text, #000000, "0");
+  Button euler = new Button(50, 420, 100, 50, element, 10, "Approximate", label, text, new Executable(){ public void execute() { euler(); }});
+  
+  
+  Button Line = new Button(250, 100, 100, 50, element, 10, "Line", label, text, new Executable(){ public void execute() { functionLine(); }});
+  Button parabola = new Button(250, 200, 100, 50, element, 10, "Parabola", label, text, new Executable(){ public void execute() { functionParabola(); }});
+  Button cubic = new Button(250, 300, 100, 50, element, 10, "Cubic", label, text, new Executable(){ public void execute() { functionCubic(); }});
+  Button root = new Button(250, 400, 100, 50, element, 10, "Root", label, text, new Executable(){ public void execute() { functionRoot(); }});
+  
   
   drawn.addDrawn(graph);
+  
+  drawn.addDrawn(xMin);
+  drawn.addDrawn(xMax);
+  drawn.addDrawn(yMin);
+  drawn.addDrawn(yMax);
+  drawn.addDrawn(submit);
+  
+  drawn.addDrawn(start);
+  drawn.addDrawn(end);
+  drawn.addDrawn(steps);
+  drawn.addDrawn(euler);
+  
   drawn.addDrawn(Line);
   drawn.addDrawn(parabola);
   drawn.addDrawn(cubic);
   drawn.addDrawn(root);
+  
   
   
   
@@ -48,8 +76,50 @@ void mousePressed()
     if(d instanceof Button)
     {
       ((Button) d).clicked();
+
+    }
+    if(d instanceof TextInput)
+    {
+      ((TextInput) d).clicked();
     }
   }
+}
+
+void keyPressed()
+{
+  for(Drawn d: drawn.getAllDrawn())
+  { 
+    if(d instanceof TextInput)
+    {
+      if(((TextInput) d).getFlag())
+      {
+        ((TextInput) d).type();
+        break;
+      }
+    }
+  }
+}
+
+public void submit()
+{
+  float[] temp = new float[4];
+  for(int i = 1; i < 5; i++)
+  {
+    temp[i - 1] = Float.parseFloat(((TextInput) drawn.getDrawn(i)).getText());
+  }
+  
+  ((Graph) drawn.getDrawn(0)).reset(temp[0], temp[1], temp[2], temp[3]);
+}
+
+public void euler()
+{
+  float[] temp = new float[3];
+  for(int i = 6; i < 9; i++)
+  {
+    temp[i - 6] = Float.parseFloat(((TextInput) drawn.getDrawn(i)).getText());
+  }
+  
+  ((Graph) drawn.getDrawn(0)).euler(temp[0], temp[1], (int) temp[2]);
 }
 
 /*
@@ -157,9 +227,24 @@ public void functionLine()
   }
   );
   
-  Function test = new Function(null, terms);
+  Function f = new Function(null, terms);
   
-  ((Graph) drawn.getDrawn(0)).setFunction(test);
+  ((Graph) drawn.getDrawn(0)).setFunction(f);
+
+  terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
+  {
+    public float operation(float x, float current)
+    {
+      return 1;
+    }
+  }
+  );
+  
+  Function d = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setDerivative(d);
 }
 
 //x^2
@@ -171,14 +256,31 @@ public void functionParabola()
   {
     public float operation(float x, float current)
     {
-      return (float) Math.pow(x, 2);
+      return pow(x, 2);
     }
   }
   );
   
-  Function test = new Function(null, terms);
+  Function f = new Function(null, terms);
   
-  ((Graph) drawn.getDrawn(0)).setFunction(test);
+  ((Graph) drawn.getDrawn(0)).setFunction(f);
+  
+  
+  
+  terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
+  {
+    public float operation(float x, float current)
+    {
+      return 2 * x;
+    }
+  }
+  );
+  
+  Function d = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setDerivative(d);
 }
 
 //x^3
@@ -190,14 +292,31 @@ public void functionCubic()
   {
     public float operation(float x, float current)
     {
-      return (float) Math.pow(x, 3);
+      return pow(x, 3);
     }
   }
   );
   
-  Function test = new Function(null, terms);
+  Function f = new Function(null, terms);
   
-  ((Graph) drawn.getDrawn(0)).setFunction(test);
+  ((Graph) drawn.getDrawn(0)).setFunction(f);
+  
+  
+  
+  terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
+  {
+    public float operation(float x, float current)
+    {
+      return 3 * pow(x, 2);
+    }
+  }
+  );
+  
+  Function d = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setDerivative(d);
 }
 
 //x^(1/2)
@@ -209,12 +328,31 @@ public void functionRoot()
   {
     public float operation(float x, float current)
     {
-      return (float) Math.pow(x, .5);
+      return pow(x, .5);
     }
   }
   );
   
-  Function test = new Function(null, terms);
+  Function f = new Function(null, terms);
   
-  ((Graph) drawn.getDrawn(0)).setFunction(test);
+  ((Graph) drawn.getDrawn(0)).setFunction(f);
+  
+  
+  
+  
+  
+  terms = new ArrayList<Calculable>();
+  
+  terms.add(new Operation(null)
+  {
+    public float operation(float x, float current)
+    {
+      return 1 / (2 * pow(x, .5));
+    }
+  }
+  );
+  
+  Function d = new Function(null, terms);
+  
+  ((Graph) drawn.getDrawn(0)).setDerivative(d);
 }
