@@ -1,6 +1,12 @@
+/*
+Daniel Stebbins, Period 5, 1/20/20
+This is my own work, D.S.
+This project is a graphing calculator which parses basic functions and graphically displays Euler's Method approximations of those functions.
+*/
+
 //Text font sizes.
 int label = 14;
-int title = 32;
+int title = 20;
 
 //Color constants.
 color background = #202020;
@@ -18,25 +24,37 @@ void setup()
   
   Graph graph = new Graph(400, 50, 500, 500, element, label, text);
   
+  //Graph input.
   TextInput xMin = new TextInput(50, 50, 100, 25, element, #ffffff, label, text, #000000, "-10");
   TextInput xMax = new TextInput(50, 90, 100, 25, element, #ffffff, label, text, #000000, "10");
   TextInput yMin = new TextInput(50, 130, 100, 25, element, #ffffff, label, text, #000000, "-10");
   TextInput yMax = new TextInput(50, 170, 100, 25, element, #ffffff, label, text, #000000, "10");
   Button submit = new Button(50, 210, 100, 50, element, 10, "Submit", label, text, new Executable(){ public void execute() { submit(); }});
   
+  //Euler's input.
+  TextInput start = new TextInput(125, 350, 100, 25, element, #ffffff, label, text, #000000, "0");
+  TextInput end = new TextInput(125, 390, 100, 25, element, #ffffff, label, text, #000000, "10");
+  TextInput steps = new TextInput(125, 430, 100, 25, element, #ffffff, label, text, #000000, "1");
+  Button euler = new Button(125, 470, 100, 50, element, 10, "Approximate", label, text, new Executable(){ public void execute() { euler(); }});
   
-  TextInput start = new TextInput(50, 300, 100, 25, element, #ffffff, label, text, #000000, "4");
-  TextInput end = new TextInput(50, 340, 100, 25, element, #ffffff, label, text, #000000, "1");
-  TextInput steps = new TextInput(50, 380, 100, 25, element, #ffffff, label, text, #000000, "0");
-  Button euler = new Button(50, 420, 100, 50, element, 10, "Approximate", label, text, new Executable(){ public void execute() { euler(); }});
   
-  
+  /*
+  EXAMPLE FUNCTIONS
   Button Line = new Button(250, 100, 100, 50, element, 10, "Line", label, text, new Executable(){ public void execute() { functionLine(); }});
   Button parabola = new Button(250, 200, 100, 50, element, 10, "Parabola", label, text, new Executable(){ public void execute() { functionParabola(); }});
   Button cubic = new Button(250, 300, 100, 50, element, 10, "Cubic", label, text, new Executable(){ public void execute() { functionCubic(); }});
   Button root = new Button(250, 400, 100, 50, element, 10, "Root", label, text, new Executable(){ public void execute() { functionRoot(); }});
+  */
   
+  //Function input.
+  TextInput function = new TextInput(200, 50, 100, 25, element, #ffffff, label, text, #000000, "x^2");
+  Button functionToggle = new Button(200, 80, 100, 25, element, 0, "Toggle", label, text, new Executable(){ public void execute() { toggleFunction(); }});
+  TextInput derivative = new TextInput(200, 140, 100, 25, element, #ffffff, label, text, #000000, "2*x");
+  Button derivativeToggle = new Button(200, 170, 100, 25, element, 0, "Toggle", label, text, new Executable(){ public void execute() { toggleDerivative(); }});
+  Button submitFunction = new Button(200, 210, 100, 50, element, 10, "Graph!", label, text, new Executable(){ public void execute() { submitFunctions(); }});
+
   
+  //Adding objects to screen.
   drawn.addDrawn(graph);
   
   drawn.addDrawn(xMin);
@@ -50,25 +68,36 @@ void setup()
   drawn.addDrawn(steps);
   drawn.addDrawn(euler);
   
+  drawn.addDrawn(function);
+  drawn.addDrawn(functionToggle);
+  drawn.addDrawn(derivative);
+  drawn.addDrawn(derivativeToggle);
+  drawn.addDrawn(submitFunction);
+  
+  /*
   drawn.addDrawn(Line);
   drawn.addDrawn(parabola);
   drawn.addDrawn(cubic);
   drawn.addDrawn(root);
+  */
   
-  
-  
-  
-  
-  //String test = "3 * x + (2 * x + 5 * ( x - 3 )) * (x + 5)";
-  //parseFunction(test);
+  submitFunctions();
 }
 
 void draw()
 {
   background(background);
   drawn.display();
+  
+  //Titles.
+  textSize(title);
+  text("Window:", 100, 25);
+  text("Euler's Method:", 175, 325);
+  text("Function:", 250, 25);
+  text("Derivative:", 250, 125);
 }
 
+//When mouse is pressed, check for text boxes and buttons.
 void mousePressed()
 {
   for(Drawn d: drawn.getAllDrawn())
@@ -85,6 +114,7 @@ void mousePressed()
   }
 }
 
+//If key is pressed and a text box is hightlighted, type the key to the text box.
 void keyPressed()
 {
   for(Drawn d: drawn.getAllDrawn())
@@ -100,6 +130,7 @@ void keyPressed()
   }
 }
 
+//Set the current window inputs to the graph's window inputs.
 public void submit()
 {
   float[] temp = new float[4];
@@ -109,8 +140,11 @@ public void submit()
   }
   
   ((Graph) drawn.getDrawn(0)).reset(temp[0], temp[1], temp[2], temp[3]);
+  
+  euler();
 }
 
+//Run an Euler's approximation with the data in the text boxes.
 public void euler()
 {
   float[] temp = new float[3];
@@ -122,97 +156,239 @@ public void euler()
   ((Graph) drawn.getDrawn(0)).euler(temp[0], temp[1], (int) temp[2]);
 }
 
-/*
-public void parseFunction(String input)
+//Turns off the graph of the function.
+public void toggleFunction()
 {
-  ArrayList<String> subfunctions = new ArrayList<String>();
+  ((Graph) drawn.getDrawn(0)).setShowFunction(!((Graph) drawn.getDrawn(0)).getShowFunction());
+}
 
+//Turns off the graph of the derivative.
+public void toggleDerivative()
+{
+  ((Graph) drawn.getDrawn(0)).setShowDerivative(!((Graph) drawn.getDrawn(0)).getShowDerivative());
+}
+
+//Applies the current functions in the text boxes to the graph.
+public void submitFunctions()
+{
+  Function function = parseFunction(((TextInput) drawn.getDrawn(10)).getText());
+  ((Graph) drawn.getDrawn(0)).setFunction(function);
+  
+  Function derivative = parseFunction(((TextInput) drawn.getDrawn(12)).getText());
+  ((Graph) drawn.getDrawn(0)).setDerivative(derivative);
+}
+
+
+
+
+//Massive chain of function parsing logic starts here, basically breaks function by "+/-" then by "*//" then by "^" and recursivly puts the small parts together using the classes Function, Term, Factor, and Operation.
+public Function parseFunction(String input)
+{
   input = input.replaceAll("\\s", "");
-  Function function = new Function(null, new ArrayList<Calculable>());
-
-  char counter = 'A';
-  while (input.contains("("))
-  {
-    int begin = input.indexOf("(");
-    int end = 0;
-
-    int parenCount = 1;
-    for (int i = begin + 1; i < input.length(); i++)
-    {
-      if (input.charAt(i) == '(')
-      {
-        parenCount++;
-      } else if (input.charAt(i) == ')')
-      {
-        parenCount--;
-      }
-
-      if (parenCount == 0)
-      {
-        end = i;
-        break;
-      }
-    }
-
-    subfunctions.add(input.substring(begin + 1, end));
-    input = input.substring(0, begin) + counter + input.substring(end + 1);
-    counter++;
-  }
-
-  String split[] = input.split("[+-]+");
-
-  println(input);
-
-  for (int i = 0; i < split.length; i++)
-  {
-    ArrayList<Calculable> operations = new ArrayList<Calculable>();
-
-    while (split[i].contains("^"))
-    {
-      int index = split[i].indexOf("^");
-
-      operation.add(parseOperation(split[i], index));
-    }
-  }
+  
+  ArrayList<Calculable> terms = parseTerms(splitTerms(input));
+  
+  return new Function(null, terms);
 }
-*/
 
-/*
-public Operation parseOperation(String term, int index)
+
+public ArrayList<String> splitTerms(String input)
 {
-  int start = 0;
-  int end = term.length() - 1;
-
-  for(int j = index; j >= 0; j--)
-  {
-    if(term.charAt(index) == '*' || term.charAt(index) == '/');
+  ArrayList<String> terms = new ArrayList<String>();
+  int paren = 0;
+  int last = 0;
+  String prefix = "";
+  
+  for(int i = 0; i < input.length(); i++)
+  {    
+    if(input.charAt(i) == '(')
     {
-      start = j;
-      break;
+      paren++;
     }
-  }
-
-  for(int j = index; j < term.length(); j++)
-  {
-    if(term.charAt(index) == '*' || term.charAt(index) == '/');
+    else if(input.charAt(i) == ')')
     {
-      end = j;
-      break;
+      paren--;
     }
-  }
-
-  String first = term.substring(start, index);
-  String second = term.substring(index, end);
-
-  if(term.charAt(index))
+    else if(paren == 0)
+    {
+      if(input.charAt(i) == '+')
+      {
+        terms.add(prefix + input.substring(last, i));
+        prefix = "";
+        last = i + 1;
+      }
+      else if(input.charAt(i) == '-')
+      {
+        terms.add(prefix + input.substring(last, i));
+        prefix = "-1*";
+        last = i + 1;
+      }
+     }
+   }
+  
+  if(last < input.length())
   {
-
+    terms.add(prefix + input.substring(last, input.length()));
   }
+  
+  return terms;
 }
-*/
 
 
+public ArrayList<Calculable> parseTerms(ArrayList<String> stringTerms)
+{
+  ArrayList<Calculable> terms = new ArrayList<Calculable>();
+  
+  for(int i = 0; i < stringTerms.size(); i++)
+  {
+    if(stringTerms.get(i).charAt(0) == '(' && stringTerms.get(i).charAt(stringTerms.get(i).length() - 1) == ')' && splitFactors(stringTerms.get(i)).size() == 1)
+    {
+      terms.add(parseFunction(stringTerms.get(i).substring(1, stringTerms.get(i).length() - 1)));
+    }
+    else
+    {
+      terms.add(new Term(parseFactors(splitFactors(stringTerms.get(i)))));
+    }
+  }
+  
+  return terms;
+}
 
+
+public ArrayList<String> splitFactors(String stringTerm)
+{
+  ArrayList<String> factors = new ArrayList<String>();
+  int paren = 0;
+  int last = 0;
+  String suffix = "";
+  
+  for(int i = 0; i < stringTerm.length(); i++)
+  {    
+    if(stringTerm.charAt(i) == '(')
+    {
+      paren++;
+    }
+    else if(stringTerm.charAt(i) == ')')
+    {
+      paren--;
+    }
+    else if(paren == 0)
+    {
+      if(stringTerm.charAt(i) == '*')
+      {
+        factors.add(stringTerm.substring(last, i) + suffix);
+        suffix = "";
+        last = i + 1;
+      }
+      else if(stringTerm.charAt(i) == '/')
+      {
+        factors.add(stringTerm.substring(last, i) + suffix);
+        suffix = "^-1";
+        last = i + 1;
+      }
+     }
+   }
+  if(last < stringTerm.length())
+  {
+    factors.add(stringTerm.substring(last, stringTerm.length()) + suffix);
+  }
+  
+  return factors;
+}
+
+public ArrayList<Calculable> parseFactors(ArrayList<String> stringFactors)
+{
+  ArrayList<Calculable> factors = new ArrayList<Calculable>();
+  
+  for(int i = 0; i < stringFactors.size(); i++)
+  {
+    if(stringFactors.get(i).charAt(0) == '(' && stringFactors.get(i).charAt(stringFactors.get(i).length() - 1) == ')' && splitExponents(stringFactors.get(i)).size() == 1)
+    {
+      factors.add(parseFunction(stringFactors.get(i).substring(1, stringFactors.get(i).length() - 1)));
+    }
+    else
+    {
+      factors.add(new Factor(parseExponents(splitExponents(stringFactors.get(i)))));
+    }
+  }
+  
+  return factors;
+}
+
+
+public ArrayList<String> splitExponents(String stringFactor)
+{
+  ArrayList<String> exponentials = new ArrayList<String>();
+  int paren = 0;
+  int last = 0;
+  
+  for(int i = 0; i < stringFactor.length(); i++)
+  {    
+    if(stringFactor.charAt(i) == '(')
+    {
+      paren++;
+    }
+    else if(stringFactor.charAt(i) == ')')
+    {
+      paren--;
+    }
+    else if(paren == 0 && stringFactor.charAt(i) == '^')
+    {
+      exponentials.add(stringFactor.substring(last, i));
+      last = i + 1;
+    }
+  }
+  if(last < stringFactor.length())
+  {
+    exponentials.add(stringFactor.substring(last, stringFactor.length()));
+  }
+  
+  return exponentials;
+}
+
+public ArrayList<Calculable> parseExponents(ArrayList<String> stringExponents)
+{
+  ArrayList<Calculable> exponents = new ArrayList<Calculable>();
+  
+  for(int i = stringExponents.size() - 1; i >= 0; i--)
+  {
+    if(stringExponents.get(i).charAt(0) == '(' && stringExponents.get(i).charAt(stringExponents.get(i).length() - 1) == ')')
+    {
+      exponents.add(parseFunction(stringExponents.get(i).substring(1, stringExponents.get(i).length() - 1)));
+    }
+    else
+    {
+      if(stringExponents.get(i).equals("x"))
+      {
+        exponents.add(new Operation(null)
+        {
+          public float calculate(float x, float current)
+          {
+            return x;
+          }
+        });
+      }
+      else
+      {
+        final float temp = Float.parseFloat(stringExponents.get(i));
+        exponents.add(new Operation(null)
+        {
+          public float calculate(float x, float current)
+          {
+            return temp;
+          }
+        });
+      }
+    }
+  }
+  
+  return exponents;
+}
+//Function parsing ends here.
+
+
+//EXAMPLE FUNCTIONS, NOT NEEDED IN CURRENT BUILD.
+/*
 //x
 public void functionLine()
 {
@@ -245,6 +421,7 @@ public void functionLine()
   Function d = new Function(null, terms);
   
   ((Graph) drawn.getDrawn(0)).setDerivative(d);
+  ((Graph) drawn.getDrawn(0)).setTangents(null);
 }
 
 //x^2
@@ -281,6 +458,7 @@ public void functionParabola()
   Function d = new Function(null, terms);
   
   ((Graph) drawn.getDrawn(0)).setDerivative(d);
+  ((Graph) drawn.getDrawn(0)).setTangents(null);
 }
 
 //x^3
@@ -317,6 +495,7 @@ public void functionCubic()
   Function d = new Function(null, terms);
   
   ((Graph) drawn.getDrawn(0)).setDerivative(d);
+  ((Graph) drawn.getDrawn(0)).setTangents(null);
 }
 
 //x^(1/2)
@@ -355,4 +534,6 @@ public void functionRoot()
   Function d = new Function(null, terms);
   
   ((Graph) drawn.getDrawn(0)).setDerivative(d);
+  ((Graph) drawn.getDrawn(0)).setTangents(null);
 }
+*/

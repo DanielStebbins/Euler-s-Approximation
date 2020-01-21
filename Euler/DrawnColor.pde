@@ -1,3 +1,4 @@
+//Parent class of any displayed object which has color.
 public abstract class DrawnColor extends Drawn
 {
     private color c;

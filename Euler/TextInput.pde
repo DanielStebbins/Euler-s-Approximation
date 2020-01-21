@@ -1,3 +1,4 @@
+//Allows the user to type text inputs.
 public class TextInput extends DrawnText
 {
   private float w;
@@ -62,7 +63,7 @@ public class TextInput extends DrawnText
     {
       flag = false;
     }
-    else
+    else if(key != CODED)
     {
       text = text + key;
     }

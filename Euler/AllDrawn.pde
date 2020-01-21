@@ -1,3 +1,4 @@
+//Contains all objects to be displayed on screen.
 public class AllDrawn
 {
   private ArrayList<Drawn> allDrawn;

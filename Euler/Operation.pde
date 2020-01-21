@@ -1,3 +1,4 @@
+//Most basic unit of a calculation, currently only used for returning values.
 class Operation extends Calculable
 {
   private float constant;

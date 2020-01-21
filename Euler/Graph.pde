@@ -23,6 +23,12 @@ public class Graph extends DrawnText
   
   private ArrayList<float[]> tangents;
   
+  //For float rounding.
+  private float tollerance;
+  
+  private boolean showFunction;
+  private boolean showDerivative;
+  
   public Graph(float x, float y, float w, float h, color c, float textSize, color textColor)
   {
     super(x, y, c, textSize, textColor);
@@ -49,6 +55,11 @@ public class Graph extends DrawnText
     function = null;
     derivative = null;
     curve = null;
+    
+    tollerance = .01;
+    
+    showFunction = true;
+    showDerivative = true;
   }
   
   public void update()
@@ -87,15 +98,24 @@ public class Graph extends DrawnText
     line(getX(), getY(), w + getX(), getY());
     line(getX(), h + getY(), w + getX(), h + getY());
     
-    graph(function, curve, element);
-    graph(derivative, dcurve, #ff0000);
+    if(showFunction)
+    {
+      graph(function, curve, #ffffff);
+    }
+    
+    if(showDerivative)
+    {
+      graph(derivative, dcurve, #ff0000);
+    }
     
     if(tangents != null)
     {
       for(int i = 0; i < tangents.size(); i++)
       {
         stroke(#0000ff);
+        strokeWeight(2);
         line(tangents.get(i)[0], tangents.get(i)[1], tangents.get(i)[2], tangents.get(i)[3]);
+        strokeWeight(1);
         stroke(element);
       }
     }
@@ -146,12 +166,14 @@ public class Graph extends DrawnText
     stroke(#0000ff);
     
     float stepSize = (end - start) / steps;
+    println(stepSize);
     
     tangents = new ArrayList<float[]>();
     float last = function.calculate(start, 0);
     float current = 0;
-    for(float i = start + stepSize; i <= start + steps * stepSize; i += stepSize)
+    for(float i = start + stepSize; i <= end + tollerance; i += stepSize)
     {
+      println("x: " + i);
       current = last + derivative.calculate(i - stepSize, 0) * stepSize;
       line(shiftX(i - stepSize), shiftY(last), shiftX(i), shiftY(current));
       
@@ -229,4 +251,12 @@ public class Graph extends DrawnText
   
   public float getYMax() { return yMax; }
   public void setYMax(float yMax) { this.yMax = yMax; } 
+  
+  public void setTangents(ArrayList<float[]> tangents) { this.tangents = tangents; }
+  
+  public boolean getShowFunction() { return showFunction; }
+  public void setShowFunction(boolean showFunction) { this.showFunction = showFunction; }
+  
+  public boolean getShowDerivative() { return showDerivative; }
+  public void setShowDerivative(boolean showDerivative) { this.showDerivative = showDerivative; }
 }

@@ -1,3 +1,4 @@
+//Parent class of any object displayed on screen.
 public abstract class Drawn
 {
   private float x;

@@ -1,3 +1,4 @@
+//Parent class of any displayed object which contains text.
 public abstract class DrawnText extends DrawnColor
 {
   private float textSize;

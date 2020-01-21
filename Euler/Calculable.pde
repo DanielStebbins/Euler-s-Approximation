@@ -1,3 +1,4 @@
+//Parent class of anything which runs mathematical functions.
 abstract class Calculable
 {
   private Calculable next;

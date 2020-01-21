@@ -1,3 +1,4 @@
+//Creates a rectangular button which detects when it is clicked and runs a piece of stored code.
 public class Button extends DrawnText
 {
   private float w;

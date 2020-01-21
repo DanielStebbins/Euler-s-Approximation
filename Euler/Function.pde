@@ -1,3 +1,4 @@
+//A mathematical function represented by a list of terms added together.
 class Function extends Calculable
 {
   private ArrayList<Calculable> terms;
