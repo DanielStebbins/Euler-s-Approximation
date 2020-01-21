@@ -203,6 +203,7 @@ public class Graph extends DrawnText
     
     curve = null;
     dcurve = null;
+
   }
   
   public float shiftX(float x)
@@ -252,6 +253,7 @@ public class Graph extends DrawnText
   public float getYMax() { return yMax; }
   public void setYMax(float yMax) { this.yMax = yMax; } 
   
+  public ArrayList<float[]> getTangents() { return tangents; }
   public void setTangents(ArrayList<float[]> tangents) { this.tangents = tangents; }
   
   public boolean getShowFunction() { return showFunction; }

@@ -141,7 +141,10 @@ public void submit()
   
   ((Graph) drawn.getDrawn(0)).reset(temp[0], temp[1], temp[2], temp[3]);
   
-  euler();
+  if(((Graph) drawn.getDrawn(0)).getTangents() != null)
+  {
+    euler();
+  }
 }
 
 //Run an Euler's approximation with the data in the text boxes.
