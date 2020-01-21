@@ -44,7 +44,7 @@ public class Graph extends DrawnText
     xTick = 1;
     yTick = 1;
     
-    sample = (xMax - xMin) / 10000;
+    sample = (xMax - xMin) / 50000;
     
     xScale = w / (xMax - xMin);
     yScale = -1 * h / (yMax - yMin);
