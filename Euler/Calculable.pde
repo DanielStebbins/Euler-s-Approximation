@@ -1,4 +1,5 @@
- abstract class Calculable
+//Parent class of anything which runs mathematical functions.
+abstract class Calculable
 {
   private Calculable next;
   
