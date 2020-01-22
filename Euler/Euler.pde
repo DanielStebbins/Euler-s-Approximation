@@ -3,18 +3,25 @@ void setup()
   size(1000, 600);
   background(100);
   String test = "3*x + (2*x + 5*(x - 3)) * (x + 5)";
-  parseFunction(test);
+  println(test);
+  //parseFunction(test);
 }
 
 void draw()
 {
+  fill(255);
+  rect(10, 10, 100, 100);
 }
+
 
 public void parseFunction(String input)
 {
   ArrayList<String> subfunctions = new ArrayList<String>();
 
   input = input.replaceAll("\\s", "");
+  
+  println(input);
+ 
   Function function = new Function(null, new ArrayList<Calculable>());
 
   char counter = 'A';
@@ -49,16 +56,32 @@ public void parseFunction(String input)
   String split[] = input.split("[+-]+");
 
   println(input);
+  
+  for(int i = 0; i < split.length; i++)
+  {
+    println(split[i]);
+  }
 
-  for (int i = 0; i < split.length; i++)
+  for(int i = 0; i < split.length; i++)
   {
     ArrayList<Calculable> operations = new ArrayList<Calculable>();
 
-    while (split[i].contains("^"))
+    while(split[i].contains("^"))
     {
       int index = split[i].indexOf("^");
-
-      operation.add(parseOperation(split[i], index));
+      operations.add(parseOperation(split[i], index));
+    }
+    
+    while(split[i].contains("*"))
+    {
+      int index = split[i].indexOf("*");
+      operations.add(parseOperation(split[i], index));
+    }
+    
+    while(split[i].contains("/"))
+    {
+      int index = split[i].indexOf("/");
+      operations.add(parseOperation(split[i], index));
     }
   }
 }
@@ -89,10 +112,17 @@ public Operation parseOperation(String term, int index)
   String first = term.substring(start, index);
   String second = term.substring(index, end);
   
-  if(term.charAt(index))
+  println(first + " " + second);
+  
+  if(term.charAt(index) == '^')
   {
-    
+    if(first.equals("x") && second.equals("x"))
+    {
+      
+    }
   }
+  
+  return null;
 }
 
 
